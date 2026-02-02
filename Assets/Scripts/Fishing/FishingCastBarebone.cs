@@ -1,125 +1,140 @@
 using UnityEngine;
 
-public class FishingRodCaster : MonoBehaviour
+namespace Fishing // Added namespace to fix your IDE warning
 {
-    [Header("Refs")]
-    public Transform rodTip;
-    public Camera cam;
-    public LineRenderer line;
-
-    IBobber bobber;
-
-    [Header("Distance Settings")]
-    public float minDistance = 6f;
-    public float maxDistance = 25f;
-
-    [Header("Arc Settings")]
-    public float minArcMultiplier = 0.15f;
-    public float maxArcMultiplier = 0.6f;
-
-    [Header("Timing")]
-    public float castDuration = 1f;
-
-    float t;
-    bool casting;
-
-    Vector3 start;
-    Vector3 flatForward;
-    float distance;
-    float arcHeight;
-
-    void Awake()
+    public class FishingCast : MonoBehaviour
     {
-        bobber = FindObjectOfType<Bobber>();
-        bobber.OnHitGround += HandleBobberHit;
-    }
+        [Header("References")]
+        public Rigidbody bobberRT;
+        public Bobber bobber;
+        // HingeJoint removed
+        public Transform head;
+        public Transform rodHead;
+        public LineRenderer line;
 
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(0) && !casting)
-            BeginCast();
+        [Header("Tuning")]
+        public float castForce = 15f;
+        public float reelSpeed = 12f;
 
-        if (casting)
-            UpdateCast();
+        private bool hasCasted;
+        private bool canReel;
+        private bool isReeling;
 
-        DrawLine();
-    }
-    
-    Vector3 targetPos;
-
-    void BeginCast()
-    {
-        bobber.ResetBobber();
-        casting = true;
-        t = 0f;
-
-        start = rodTip.position;
-        Vector3 forward = cam.transform.forward;
-        float pitchFactor = Mathf.Clamp01(forward.y + 0.5f);
-
-        distance = Mathf.Lerp(minDistance, maxDistance, pitchFactor);
-        flatForward = Vector3.ProjectOnPlane(forward, Vector3.up).normalized;
-    
-        // Define exactly where the bobber SHOULD land if it hits nothing
-        targetPos = start + (flatForward * distance);
-    
-        float arcMul = Mathf.Lerp(minArcMultiplier, maxArcMultiplier, pitchFactor);
-        arcHeight = distance * arcMul;
-    }
-
-    void UpdateCast()
-    {
-        t += Time.deltaTime / castDuration;
-
-        // 1. Move horizontally from start to targetPos based on t
-        Vector3 currentPos = Vector3.Lerp(start, targetPos, t);
-
-        // 2. Add the vertical arc height
-        // Using a parabola (4 * t * (1-t)) is often cleaner than Sin for gravity feel
-        float heightOffset = Mathf.Sin(Mathf.PI * Mathf.Clamp01(t)) * arcHeight;
-        currentPos.y += heightOffset;
-
-        bobber.SetPosition(currentPos);
-
-        // Stop if the animation finishes even if no collision occurred
-        if (t >= 1f)
+        private void OnEnable()
         {
-            casting = false;
+            Bobber.OnBobberLanded += EnableReel;
         }
-    }
 
-    void HandleBobberHit(Vector3 hitPoint)
-    {
-        casting = false;
-        bobber.SetPosition(hitPoint);
-    }
-
-    void DrawLine()
-    {
-        Vector3 p0 = rodTip.position;
-        Vector3 p2 = ((MonoBehaviour)bobber).transform.position;
-
-        Vector3 mid = (p0 + p2) * 0.5f;
-
-        Vector3 p1;
-        if (casting)
-            p1 = mid + Vector3.up * Mathf.Sin(Mathf.PI * t) * 0.5f;
-        else
-            p1 = mid + Vector3.down * 0.6f;
-
-        int segments = 20;
-        line.positionCount = segments;
-
-        for (int i = 0; i < segments; i++)
+        private void OnDisable()
         {
-            float tt = i / (segments - 1f);
+            Bobber.OnBobberLanded -= EnableReel;
+        }
 
-            Vector3 point =
-                Mathf.Pow(1 - tt, 2) * p0 +
-                2 * (1 - tt) * tt * p1 +
-                Mathf.Pow(tt, 2) * p2;
+        private void Start()
+        {
+            line.positionCount = 2;
+            line.useWorldSpace = true;
 
-            line.SetPosition(i, point);
+            // Start correctly attached to rod
+            AttachToRodIdle();
+        }
+
+        private void Update()
+        {
+            IdleFollowRod();
+            CastRod();
+            StartReel();
+            ReelMovement();
+            UpdateLine();
+        }
+
+        private void CastRod()
+        {
+            if (Input.GetMouseButtonDown(0) && !hasCasted)
+            {
+                hasCasted = true;
+                canReel = false;
+                isReeling = false;
+                bobber.ResetBobber();
+
+                // Deparent and position
+                bobberRT.transform.parent = null;
+                bobberRT.transform.position = head.position;
+
+                // Reset physics and launch
+                bobberRT.velocity = Vector3.zero;
+                bobberRT.angularVelocity = Vector3.zero;
+                bobberRT.isKinematic = false;
+
+                bobberRT.AddForce(head.forward * castForce, ForceMode.Impulse);
+            }
+        }
+
+        private void EnableReel()
+        {
+            if (hasCasted)
+            {
+                canReel = true;
+            }
+        }
+
+        private void StartReel()
+        {
+            if (Input.GetMouseButtonDown(1) && canReel && !isReeling)
+            {
+                // Try to catch fish (optional, does not block reel)
+                if (bobber.currentFish != null && bobber.currentFish.IsBiting())
+                {
+                    bobber.currentFish.TryCatchFish(bobberRT.transform);
+                }
+
+                isReeling = true;
+                bobberRT.isKinematic = true;
+            }
+        }
+
+
+
+        private void ReelMovement()
+        {
+            if (!isReeling) return;
+
+            bobberRT.transform.position = Vector3.MoveTowards(
+                bobberRT.transform.position,
+                rodHead.position,
+                reelSpeed * Time.deltaTime
+            );
+
+            if (Vector3.Distance(bobberRT.transform.position, rodHead.position) < 0.05f)
+            {
+                isReeling = false;
+                hasCasted = false;
+                canReel = false;
+
+                AttachToRodIdle();
+            }
+        }
+
+        private void IdleFollowRod()
+        {
+            if (!hasCasted && !isReeling)
+            {
+                AttachToRodIdle();
+            }
+        }
+
+        private void AttachToRodIdle()
+        {
+            bobberRT.isKinematic = true;
+            bobberRT.transform.parent = rodHead;
+            bobberRT.transform.localPosition = Vector3.zero;
+            bobberRT.transform.localRotation = Quaternion.identity;
+        }
+
+        private void UpdateLine()
+        {
+            line.SetPosition(0, rodHead.position);
+            line.SetPosition(1, bobberRT.transform.position);
         }
     }
 }
