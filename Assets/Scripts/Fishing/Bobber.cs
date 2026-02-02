@@ -7,85 +7,76 @@ public class Bobber : MonoBehaviour
     
     public IFish currentFish;
 
+    [Header("Detection Settings")]
     public float groundCheckRadius = 0.2f;
-    public float groundCheckDistance = 0.3f;
     public LayerMask groundLayer;
+    
     private Rigidbody rb;
-
     private bool hasLanded;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        // Ensure the Rigidbody is set to Continuous for extra safety
+        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (hasLanded) return;
 
-        if (Physics.SphereCast(transform.position, groundCheckRadius, Vector3.down,
-                out RaycastHit hit, groundCheckDistance, groundLayer))
-        {
-            rb.isKinematic = true;
-            hasLanded = true;
-            OnBobberLanded?.Invoke();
-            currentFish = hit.collider.GetComponent<IFish>();
+        // Calculate the distance the bobber will travel this physics step
+        float stepDistance = rb.velocity.magnitude * Time.fixedDeltaTime;
+        Vector3 moveDirection = rb.velocity.normalized;
 
-            if (currentFish != null)
-            {
-                currentFish.BobberLanded(transform);
-            }
+        // Use a minimum distance check to ensure it detects ground even when moving slowly
+        float castDistance = Mathf.Max(stepDistance, 0.1f);
+
+        // Perform a SphereCast in the direction of travel
+        if (Physics.SphereCast(transform.position, groundCheckRadius, moveDirection,
+                out RaycastHit hit, castDistance, groundLayer))
+        {
+            HandleLanding(hit);
         }
     }
 
+    private void HandleLanding(RaycastHit hit)
+    {
+        hasLanded = true;
+        
+        // Snap to the point of impact so it doesn't float in the air
+        transform.position = hit.point + (hit.normal * groundCheckRadius);
+        
+        rb.isKinematic = true;
+        rb.velocity = Vector3.zero;
+
+        OnBobberLanded?.Invoke();
+        
+        currentFish = hit.collider.GetComponent<IFish>();
+
+        if (currentFish != null)
+        {
+            currentFish.BobberLanded(transform);
+        }
+    }
 
     public void ResetBobber()
     {
         rb.isKinematic = false;
         hasLanded = false;
-        currentFish = null;  
+        currentFish = null;
     }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow;
+        if (rb == null) return;
 
-        Vector3 start = transform.position;
-        Vector3 end = start + Vector3.down * groundCheckDistance;
-
-        // Start sphere
-        Gizmos.DrawWireSphere(start, groundCheckRadius);
-
-        // End sphere
-        Gizmos.DrawWireSphere(end, groundCheckRadius);
-
-        // Lines connecting spheres (visualize the cast)
-        Gizmos.DrawLine(start + Vector3.forward * groundCheckRadius, end + Vector3.forward * groundCheckRadius);
-        Gizmos.DrawLine(start - Vector3.forward * groundCheckRadius, end - Vector3.forward * groundCheckRadius);
-        Gizmos.DrawLine(start + Vector3.right * groundCheckRadius, end + Vector3.right * groundCheckRadius);
-        Gizmos.DrawLine(start - Vector3.right * groundCheckRadius, end - Vector3.right * groundCheckRadius);
-
-        // Center line
-        Gizmos.DrawLine(start, end);
+        Gizmos.color = Color.red;
+        Vector3 direction = rb.velocity.normalized;
+        float dist = Mathf.Max(rb.velocity.magnitude * Time.fixedDeltaTime, 0.5f);
+        
+        // Visualize the predictive path
+        Gizmos.DrawWireSphere(transform.position + (direction * dist), groundCheckRadius);
+        Gizmos.DrawLine(transform.position, transform.position + (direction * dist));
     }
 }

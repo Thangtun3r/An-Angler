@@ -2412,7 +2412,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0.00000006558937, y: 0.9350964, z: -0.3543935, w: 0.000002949702}
   m_LocalPosition: {x: -5.530031, y: -3.2895374, z: -17.60507}
-  m_LocalScale: {x: 0.10380316, y: 0.10380317, z: 0.06432164}
+  m_LocalScale: {x: 0.11612, y: 0.11612, z: 0.11612}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -2528,7 +2528,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groundCheckRadius: 0.07
-  groundCheckDistance: 0.04
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
