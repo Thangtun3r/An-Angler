@@ -49,8 +49,8 @@ public class Player : MonoBehaviour
     
     private void LockMouse()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        /*Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;*/
     }
 
     void SetPlayerSpawnPoint(Transform spawnPoint)
