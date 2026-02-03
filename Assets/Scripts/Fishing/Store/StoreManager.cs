@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class StoreManager : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class StoreManager : MonoBehaviour
     {
         playerInventory = FindObjectOfType<PlayerInventory>().Inventory;
     }
+
 
     private void OnEnable()
     {
@@ -40,29 +42,22 @@ public class StoreManager : MonoBehaviour
         if (currentStoreSlot.soldOut) return;
 
         if (!CanAfford(playerInventory, currentStoreSlot))
-        {
-            Debug.Log("Not enough fish!");
             return;
-        }
 
         PayCost(playerInventory, currentStoreSlot);
 
-        bool added = playerInventory.AddItem(currentStoreSlot.shopItem);
-
-        if (added)
+        if (playerInventory.AddItem(currentStoreSlot.shopItem))
         {
             currentStoreSlot.soldOut = true;
             currentStoreSlot.iconImage.color = Color.gray;
         }
     }
-
+    
 
     bool CanAfford(FishInventory inv, UIStoreSlot slot)
     {
         if (slot.acceptAnyFish)
-        {
-            return CountTotalFish(inv) >= slot.anyFishAmount;
-        }
+            return CountUniqueFish(inv) >= slot.anyFishAmount;
 
         foreach (var cost in slot.costs)
         {
@@ -77,7 +72,7 @@ public class StoreManager : MonoBehaviour
     {
         if (slot.acceptAnyFish)
         {
-            RemoveAnyFish(inv, slot.anyFishAmount);
+            RemoveUniqueFish(inv, slot.anyFishAmount);
             return;
         }
 
@@ -92,7 +87,7 @@ public class StoreManager : MonoBehaviour
     {
         int count = 0;
 
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < inv.SlotCount; i++)
         {
             if (inv.GetItem(i) == item)
                 count++;
@@ -101,22 +96,23 @@ public class StoreManager : MonoBehaviour
         return count;
     }
 
-    int CountTotalFish(FishInventory inv)
+    int CountUniqueFish(FishInventory inv)
     {
-        int count = 0;
+        HashSet<ItemSO> unique = new HashSet<ItemSO>();
 
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < inv.SlotCount; i++)
         {
-            if (inv.GetItem(i) != null)
-                count++;
+            var fish = inv.GetItem(i);
+            if (fish != null)
+                unique.Add(fish);
         }
 
-        return count;
+        return unique.Count;
     }
 
     void RemoveItemAmount(FishInventory inv, ItemSO item, int amount)
     {
-        for (int i = 0; i < 20 && amount > 0; i++)
+        for (int i = 0; i < inv.SlotCount && amount > 0; i++)
         {
             if (inv.GetItem(i) == item)
             {
@@ -126,14 +122,18 @@ public class StoreManager : MonoBehaviour
         }
     }
 
-    void RemoveAnyFish(FishInventory inv, int amount)
+    void RemoveUniqueFish(FishInventory inv, int amount)
     {
-        for (int i = 0; i < 20 && amount > 0; i++)
+        HashSet<ItemSO> removedTypes = new HashSet<ItemSO>();
+
+        for (int i = 0; i < inv.SlotCount && removedTypes.Count < amount; i++)
         {
-            if (inv.GetItem(i) != null)
+            var fish = inv.GetItem(i);
+
+            if (fish != null && !removedTypes.Contains(fish))
             {
                 inv.RemoveAt(i);
-                amount--;
+                removedTypes.Add(fish);
             }
         }
     }
@@ -141,9 +141,7 @@ public class StoreManager : MonoBehaviour
     string BuildPriceText(UIStoreSlot slot)
     {
         if (slot.acceptAnyFish)
-        {
-            return $"Cost:\n{slot.anyFishAmount}x Any Fish";
-        }
+            return $"Cost:\n{slot.anyFishAmount}x Different Fish";
 
         string text = "Cost:\n";
 

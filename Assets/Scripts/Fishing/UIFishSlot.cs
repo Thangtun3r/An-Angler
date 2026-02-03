@@ -34,6 +34,10 @@ public class UIFishSlot : MonoBehaviour, IPointerClickHandler
         {
             if (isDiscardSlot)
             {
+                if(currentFish.isQuestItem == true)
+                {
+                    return;
+                }
                 fishInventory.RemoveAt(selectedIndex);
             }
             else
@@ -49,24 +53,16 @@ public class UIFishSlot : MonoBehaviour, IPointerClickHandler
     {
         if (isDiscardSlot) return;
 
-        if (slotIndex == selectedIndex)
-        {
-            fishImage.sprite = null;
-            fishImage.color = new Color(1, 1, 1, 0);
-            return;
-        }
-
         currentFish = fishInventory.GetItem(slotIndex);
-
+        fishImage.color = Color.white;
         if (currentFish == null)
         {
+            fishName = "Empty";
             fishImage.sprite = null;
             fishImage.color = new Color(1, 1, 1, 0);
             return;
         }
-
+        fishName = currentFish.item_name;
         fishImage.sprite = currentFish.item_sprite;
-        fishImage.color = Color.white;
     }
-
 }
