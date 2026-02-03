@@ -3,7 +3,7 @@ using System.Collections;
 
 public class FishContainer : MonoBehaviour, IFish
 {
-    public FishSO fishSO;
+    public ItemSO fishSO;
 
     [Header("Bite Timing")]
     public float minWaitTime = 2f;
@@ -42,7 +42,7 @@ public class FishContainer : MonoBehaviour, IFish
     {
         if (!fishIsBiting) return false;
 
-        Instantiate(fishSO.fishprefab, bobber.position, Quaternion.identity);
+        Instantiate(fishSO.item_prefab, bobber.position, Quaternion.identity);
         fishIsBiting = false;
         return true;
     }

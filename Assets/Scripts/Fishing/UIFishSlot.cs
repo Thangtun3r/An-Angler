@@ -8,7 +8,7 @@ public class UIFishSlot : MonoBehaviour, IPointerClickHandler
     public Image fishImage;
     public FishInventory fishInventory;
     private int slotIndex;
-    private FishSO currentFish;
+    private ItemSO currentFish;
 
     public bool isDiscardSlot;
     public static int selectedIndex = -1;
@@ -19,11 +19,11 @@ public class UIFishSlot : MonoBehaviour, IPointerClickHandler
         fishInventory = fishInven;
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    public void OnPointerClick(PointerEventData evaentData)
     {
         if (selectedIndex == -1)
         {
-            if (!isDiscardSlot && fishInventory.GetFishAt(slotIndex) != null)
+            if (!isDiscardSlot && fishInventory.GetItem(slotIndex) != null)
             {
                 selectedIndex = slotIndex;
                 CursorFollower.Instance.SetIcon(fishImage.sprite);
@@ -49,7 +49,7 @@ public class UIFishSlot : MonoBehaviour, IPointerClickHandler
     {
         if (isDiscardSlot) return;
 
-        currentFish = fishInventory.GetFishAt(slotIndex);
+        currentFish = fishInventory.GetItem(slotIndex);
         fishImage.color = Color.white;
         if (currentFish == null)
         {
@@ -58,7 +58,7 @@ public class UIFishSlot : MonoBehaviour, IPointerClickHandler
             fishImage.color = new Color(1, 1, 1, 0);
             return;
         }
-        fishName = currentFish.fishname;
-        fishImage.sprite = currentFish.fishimage;
+        fishName = currentFish.item_name;
+        fishImage.sprite = currentFish.item_sprite;
     }
 }

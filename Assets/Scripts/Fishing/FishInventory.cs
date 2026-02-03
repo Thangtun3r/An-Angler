@@ -18,14 +18,14 @@ public class FishInventory : MonoBehaviour
         }
     }
     
-    public bool AddFish(FishSO fish)
+    public bool AddItem(ItemSO item)
     {
         Debug.Log("fishadded");
         for (int i = 0; i < slots.Count; i++)
         {
-            if (slots[i].fishData == null)
+            if (slots[i].itemData == null)
             {
-                slots[i].fishData = fish;
+                slots[i].itemData = item;
                 OnInventoryChanged?.Invoke();
                 return true;
             }
@@ -34,13 +34,13 @@ public class FishInventory : MonoBehaviour
     }
     
     //precisely remove a fish (which won't have many use case but still useful to have)
-    public bool RemoveFish(FishSO fish)
+    public bool RemoveItem(ItemSO fish)
     {
         for (int i = 0; i < slots.Count; i++)
         {
-            if (slots[i].fishData == fish)
+            if (slots[i].itemData == fish)
             {
-                slots[i].fishData = null;
+                slots[i].itemData = null;
                 OnInventoryChanged?.Invoke();
                 return true;
             }
@@ -48,9 +48,9 @@ public class FishInventory : MonoBehaviour
         return false; 
     }
 
-    public FishSO GetFishAt(int index)
+    public ItemSO GetItem(int index)
     {
-        return slots[index].fishData;
+        return slots[index].itemData;
     }
     
     //remove fish at index like specific index like which index to remove fish from
@@ -58,16 +58,16 @@ public class FishInventory : MonoBehaviour
     {
         if (index >= 0 && index < slots.Count)
         {
-            slots[index].fishData = null;
+            slots[index].itemData = null;
             OnInventoryChanged?.Invoke();
         }
     }
     
     public void SwapSlots(int a, int b)
     {
-        var temp = slots[a].fishData;
-        slots[a].fishData = slots[b].fishData;
-        slots[b].fishData = temp;
+        var temp = slots[a].itemData;
+        slots[a].itemData = slots[b].itemData;
+        slots[b].itemData = temp;
 
         OnInventoryChanged?.Invoke();
     }

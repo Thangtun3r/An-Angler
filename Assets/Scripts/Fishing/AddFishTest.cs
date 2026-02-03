@@ -5,10 +5,10 @@ using UnityEngine;
 public class AddFishTest : MonoBehaviour
 {
     public FishInventory fishInventory;
-    public FishSO testFish;
+    public ItemSO testFish;
 
     public void AddTestFish()
     {
-        fishInventory.AddFish(testFish);
+        fishInventory.AddItem(testFish);
     }
 }

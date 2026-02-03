@@ -4,11 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [CreateAssetMenu(fileName = "NewFish", menuName = "Fishing/Fish", order = 1)]
-public class FishSO : ScriptableObject
+public class ItemSO : ScriptableObject
 {
-    public string fishname;
-    public Sprite fishimage;
-    public GameObject fishprefab;
-    
+    public string item_name;
+    public Sprite item_sprite;
+    public GameObject item_prefab;
+    [TextArea(3, 10)]
+    public string ItemDescription;
 }
 

@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class InventoryItem 
 {
-    public FishSO fishData;
+    public ItemSO itemData;
 }
