@@ -7,6 +7,8 @@ public class PlayerInteraction : MonoBehaviour
 
     private Camera mainCamera;
 
+    [HideInInspector] public bool isTalking = false;
+
     private void Start()
     {
         mainCamera = Camera.main;
@@ -14,12 +16,15 @@ public class PlayerInteraction : MonoBehaviour
 
     private void Update()
     {
-        HandleInteraction();
+        if (!isTalking)
+        {
+            HandleInteraction();
+        }
     }
 
     private void HandleInteraction()
     {
-        bool interactableInSight = false;
+        //bool interactableInSight = false;
 
         // Get the ray from the center of the screen
         Ray ray = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
@@ -33,9 +38,9 @@ public class PlayerInteraction : MonoBehaviour
             if (interactable != null)
             {
                 interactable.Highlight();
-                interactableInSight = true;
+                //interactableInSight = true;
 
-                if (Input.GetMouseButtonDown(0))
+                if (Input.GetKeyDown(KeyCode.E))
                 {
                     interactable.Interact();
                 }

@@ -19,7 +19,7 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("Mouse sensitivity (no deltaTime scaling)")]
     public float mouseSensitivity = 100f;
 
-    public bool unlockMouse = false;
+    [HideInInspector] public bool isTalking = false;
     private CharacterController characterController;
     private Vector3 moveDirection;
     private const float gravity = -9.81f;
@@ -43,7 +43,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (!unlockMouse)
+        if (!isTalking)
         {
             HandleCameraRotation();
         }

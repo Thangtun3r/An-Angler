@@ -16,6 +16,8 @@ public class FishingCast : MonoBehaviour
     private bool hasCasted;
     private bool isReeling;
 
+    [HideInInspector] public bool isTalking = false;
+
     private void Start()
     {
         line.positionCount = 2;
@@ -25,16 +27,19 @@ public class FishingCast : MonoBehaviour
 
     private void Update()
     {
-        // One button to rule them all
-        if (Input.GetMouseButtonDown(0))
+        if (!isTalking)
         {
-            if (!hasCasted && !isReeling)
+            // One button to rule them all
+            if (Input.GetMouseButtonDown(0))
             {
-                CastRod();
-            }
-            else if (hasCasted && !isReeling)
-            {
-                StartReel();
+                if (!hasCasted && !isReeling)
+                {
+                    CastRod();
+                }
+                else if (hasCasted && !isReeling)
+                {
+                    StartReel();
+                }
             }
         }
 
