@@ -1,38 +1,61 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class UIFishSlot : MonoBehaviour
+public class UIFishSlot : MonoBehaviour, IPointerClickHandler
 {
     private string fishName;
-    private Image fishImage;
-    private FishInventory fishInventory;
+    public Image fishImage;
+    public FishInventory fishInventory;
     private int slotIndex;
     private FishSO currentFish;
 
-    private void Start()
-    {
-        fishImage = GetComponent<Image>();
-    }
+    public bool isDiscardSlot;
+    public static int selectedIndex = -1;
 
     public void Initialize(int index, FishInventory fishInven)
     {
         slotIndex = index;
         fishInventory = fishInven;
-        
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (selectedIndex == -1)
+        {
+            if (!isDiscardSlot && fishInventory.GetFishAt(slotIndex) != null)
+            {
+                selectedIndex = slotIndex;
+                CursorFollower.Instance.SetIcon(fishImage.sprite);
+                fishImage.color = new Color(1, 1, 1, 0);
+            }
+        }
+        else
+        {
+            if (isDiscardSlot)
+            {
+                fishInventory.RemoveAt(selectedIndex);
+            }
+            else
+            {
+                fishInventory.SwapSlots(selectedIndex, slotIndex);
+            }
+            selectedIndex = -1;
+            CursorFollower.Instance.SetIcon(null);
+        }
     }
 
     public void RefreshSlot()
     {
-        Debug.Log("RefreshSlot");
-        
+        if (isDiscardSlot) return;
+
         currentFish = fishInventory.GetFishAt(slotIndex);
+        fishImage.color = Color.white;
         if (currentFish == null)
         {
             fishName = "Empty";
             fishImage.sprite = null;
+            fishImage.color = new Color(1, 1, 1, 0);
             return;
         }
         fishName = currentFish.fishname;

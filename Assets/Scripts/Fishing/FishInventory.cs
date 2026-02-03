@@ -33,6 +33,7 @@ public class FishInventory : MonoBehaviour
         return false; 
     }
     
+    //precisely remove a fish (which won't have many use case but still useful to have)
     public bool RemoveFish(FishSO fish)
     {
         for (int i = 0; i < slots.Count; i++)
@@ -47,13 +48,29 @@ public class FishInventory : MonoBehaviour
         return false; 
     }
 
-    public FishSO GetFishAt(int slotIndex)
+    public FishSO GetFishAt(int index)
     {
-        return slots[slotIndex].fishData;
+        return slots[index].fishData;
     }
     
+    //remove fish at index like specific index like which index to remove fish from
+    public void RemoveAt(int index)
+    {
+        if (index >= 0 && index < slots.Count)
+        {
+            slots[index].fishData = null;
+            OnInventoryChanged?.Invoke();
+        }
+    }
     
+    public void SwapSlots(int a, int b)
+    {
+        var temp = slots[a].fishData;
+        slots[a].fishData = slots[b].fishData;
+        slots[b].fishData = temp;
 
+        OnInventoryChanged?.Invoke();
+    }
 
 
 
