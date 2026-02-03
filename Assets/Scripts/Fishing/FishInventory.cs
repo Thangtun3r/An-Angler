@@ -4,74 +4,89 @@ using UnityEngine;
 
 public class FishInventory : MonoBehaviour
 {
+    public static event Action OnInventoryChanged;
 
-    public static event Action OnInventoryChanged; 
+    [SerializeField] private int slotCount = 20;
+
     private List<InventoryItem> slots;
-    public int slotCount = 20;
-    
+
     void Awake()
     {
         slots = new List<InventoryItem>(slotCount);
+
         for (int i = 0; i < slotCount; i++)
-        {
             slots.Add(new InventoryItem());
-        }
     }
-    
+
     public bool AddItem(ItemSO item)
     {
-        Debug.Log("fishadded");
+        if (item == null) return false;
+
         for (int i = 0; i < slots.Count; i++)
         {
             if (slots[i].itemData == null)
             {
                 slots[i].itemData = item;
-                OnInventoryChanged?.Invoke();
+                NotifyChange();
                 return true;
             }
         }
+
         return false; 
     }
-    
-    //precisely remove a fish (which won't have many use case but still useful to have)
-    public bool RemoveItem(ItemSO fish)
+
+    public bool RemoveItem(ItemSO item)
     {
+        if (item == null) return false;
+
         for (int i = 0; i < slots.Count; i++)
         {
-            if (slots[i].itemData == fish)
+            if (slots[i].itemData == item)
             {
                 slots[i].itemData = null;
-                OnInventoryChanged?.Invoke();
+                NotifyChange();
                 return true;
             }
         }
-        return false; 
+
+        return false;
     }
 
     public ItemSO GetItem(int index)
     {
+        if (!IsValidIndex(index)) return null;
         return slots[index].itemData;
     }
-    
-    //remove fish at index like specific index like which index to remove fish from
+
     public void RemoveAt(int index)
     {
-        if (index >= 0 && index < slots.Count)
+        if (!IsValidIndex(index)) return;
+
+        if (slots[index].itemData != null)
         {
             slots[index].itemData = null;
-            OnInventoryChanged?.Invoke();
+            NotifyChange();
         }
     }
-    
+
     public void SwapSlots(int a, int b)
     {
+        if (!IsValidIndex(a) || !IsValidIndex(b) || a == b) return;
+
         var temp = slots[a].itemData;
         slots[a].itemData = slots[b].itemData;
         slots[b].itemData = temp;
 
-        OnInventoryChanged?.Invoke();
+        NotifyChange();
     }
 
+    private bool IsValidIndex(int index)
+    {
+        return index >= 0 && index < slots.Count;
+    }
 
-
+    private void NotifyChange()
+    {
+        OnInventoryChanged?.Invoke();
+    }
 }

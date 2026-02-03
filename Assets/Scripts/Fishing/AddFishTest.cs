@@ -6,9 +6,14 @@ public class AddFishTest : MonoBehaviour
 {
     public FishInventory fishInventory;
     public ItemSO testFish;
+    private FishInventory playerInventory;
 
+    void Start()
+    {
+        playerInventory = FindObjectOfType<PlayerInventory>().Inventory;
+    }
     public void AddTestFish()
     {
-        fishInventory.AddItem(testFish);
+        playerInventory.AddItem(testFish);
     }
 }

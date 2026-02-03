@@ -1,26 +1,14 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class UIFishInventory : MonoBehaviour
 {
-    public FishInventory fishInventory;
     private UIFishSlot[] fishSlots;
+    private FishInventory fishInventory;
 
+    void Awake()
+    {
+        fishInventory = FindObjectOfType<PlayerInventory>().Inventory;
 
-    private void OnEnable()
-    {
-        FishInventory.OnInventoryChanged += RefreshUI;
-    }
-    private void OnDisable()
-    {
-        FishInventory.OnInventoryChanged -= RefreshUI;
-    }
-    
-
-    void Start()
-    {
         fishSlots = GetComponentsInChildren<UIFishSlot>();
 
         for (int i = 0; i < fishSlots.Length; i++)
@@ -28,7 +16,17 @@ public class UIFishInventory : MonoBehaviour
             fishSlots[i].Initialize(i, fishInventory);
         }
     }
-    
+
+    private void OnEnable()
+    {
+        FishInventory.OnInventoryChanged += RefreshUI;
+    }
+
+    private void OnDisable()
+    {
+        FishInventory.OnInventoryChanged -= RefreshUI;
+    }
+
     void RefreshUI()
     {
         for (int i = 0; i < fishSlots.Length; i++)
@@ -36,13 +34,4 @@ public class UIFishInventory : MonoBehaviour
             fishSlots[i].RefreshSlot();
         }
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
 }

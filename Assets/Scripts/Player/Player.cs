@@ -49,8 +49,8 @@ public class Player : MonoBehaviour
     
     public void LockMouse()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        /*Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;*/
     }
 
     public void UnlockMouse()

@@ -49,16 +49,24 @@ public class UIFishSlot : MonoBehaviour, IPointerClickHandler
     {
         if (isDiscardSlot) return;
 
-        currentFish = fishInventory.GetItem(slotIndex);
-        fishImage.color = Color.white;
-        if (currentFish == null)
+        if (slotIndex == selectedIndex)
         {
-            fishName = "Empty";
             fishImage.sprite = null;
             fishImage.color = new Color(1, 1, 1, 0);
             return;
         }
-        fishName = currentFish.item_name;
+
+        currentFish = fishInventory.GetItem(slotIndex);
+
+        if (currentFish == null)
+        {
+            fishImage.sprite = null;
+            fishImage.color = new Color(1, 1, 1, 0);
+            return;
+        }
+
         fishImage.sprite = currentFish.item_sprite;
+        fishImage.color = Color.white;
     }
+
 }
