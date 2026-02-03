@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: moooSHI
   m_EditorClassIdentifier: 
   fishname: Fish 2
+  fishimage: {fileID: -337617536, guid: 7f0ce61fc5059cc4d81b1c914cc5005d, type: 3}
   fishprefab: {fileID: 6885332304120830621, guid: f598b0956870d2946abff7980a450071,
     type: 3}
