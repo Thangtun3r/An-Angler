@@ -14,6 +14,7 @@ public class FishInventory : MonoBehaviour
 
     void Awake()
     {
+        InventoryService.RegisterPlayerInventory(this);
         slots = new List<InventoryItem>(slotCount);
 
         for (int i = 0; i < slotCount; i++)

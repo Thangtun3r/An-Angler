@@ -41,8 +41,10 @@ public class FishContainer : MonoBehaviour, IFish
     public bool TryCatchFish(Transform bobber)
     {
         if (!fishIsBiting) return false;
-
+        
+        
         Instantiate(fishSO.item_prefab, bobber.position, Quaternion.identity);
+        InventoryService.AddToPlayer(fishSO);
         fishIsBiting = false;
         return true;
     }

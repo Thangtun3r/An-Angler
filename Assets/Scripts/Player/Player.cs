@@ -6,63 +6,90 @@ public class Player : MonoBehaviour
     private PlayerMovement movement;
     private PlayerInteraction interaction;
     public CharacterController characterController;
+    private FishingCast fishingCast;
 
     private void Awake()
     {
         movement = GetComponent<PlayerMovement>();
         interaction = GetComponent<PlayerInteraction>();
         characterController = GetComponent<CharacterController>();
+        fishingCast = GetComponent<FishingCast>(); 
+        
     }
 
+    private void OnEnable()
+    {
+        PlayerInventory.OnInventoryToggled += HandleInventoryToggle;
+    }
+
+    private void OnDisable()
+    {
+        PlayerInventory.OnInventoryToggled -= HandleInventoryToggle;
+    }
+    
+    private void HandleInventoryToggle(bool isOpen)
+    {
+        if (isOpen)
+        {
+            DisablePlayer();
+            UnlockMouse();
+        }
+        else
+        {
+            EnablePlayer();
+            LockMouse();
+        }
+    }
 
     private void Start()
     {
         LockMouse();
     }
 
-
-    private void DisablePlayer()
+    public void DisablePlayer()
     {
         movement.enabled = false;
         interaction.enabled = false;
         characterController.enabled = false;
+        fishingCast.enabled = false;
     }
 
-    private void EnablePlayer()
+    public void EnablePlayer()
     {
         movement.enabled = true;
         interaction.enabled = true;
         characterController.enabled = true;
-        
+        fishingCast.enabled = true;
     }
 
-    private void FreezeMovementOnly()
+    public void FreezeMovementOnly()
     {
-        movement.IsFrozen = true;       
+        movement.IsFrozen = true;
     }
 
-    private void UnFreezeMovementOnly()
+    public void UnFreezeMovementOnly()
     {
         movement.IsFrozen = false;
     }
-    
-    
-    private void LockMouse()
+
+    public void LockMouse()
     {
-        /*Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;*/
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
-    void SetPlayerSpawnPoint(Transform spawnPoint)
+    public void UnlockMouse()
     {
-        
-        // Disable CharacterController to allow position changes
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    public void SetPlayerSpawnPoint(Transform spawnPoint)
+    {
         characterController.enabled = false;
         transform.position = spawnPoint.position;
         transform.rotation = spawnPoint.rotation;
         movement.ResetHead();
-        
-        // Re-enable CharacterController
         characterController.enabled = true;
     }
 }
