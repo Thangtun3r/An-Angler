@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections;
-
+using DG.Tweening;
 public class FishContainer : MonoBehaviour, IFish
 {
     public ItemSO fishSO;
@@ -38,14 +38,57 @@ public class FishContainer : MonoBehaviour, IFish
         Debug.Log("Fish got away...");
     }
 
-    public bool TryCatchFish(Transform bobber)
+    public bool TryCatchFish(Transform handTransform)
     {
         if (!fishIsBiting) return false;
-        
-        
-        Instantiate(fishSO.item_prefab, bobber.position, Quaternion.identity);
-        InventoryService.AddToPlayer(fishSO);
+
         fishIsBiting = false;
+
+        GameObject fishObj = Instantiate(
+            fishSO.item_prefab,
+            transform.position,           
+            Quaternion.identity
+        );
+
+        AnimateFishToHand(fishObj, handTransform);
+
         return true;
     }
+    private void AnimateFishToHand(GameObject fishObj, Transform hand)
+    {
+        Sequence seq = DOTween.Sequence();
+
+        float travelTime = 0.5f;
+
+        // flyyy to hand
+        seq.Append(
+            fishObj.transform.DOMove(hand.position, travelTime)
+                .SetEase(Ease.InOutQuad)
+        );
+        
+        seq.Join(
+            fishObj.transform.DORotate(
+                new Vector3(0, 1440f, 0),
+                travelTime,
+                RotateMode.FastBeyond360
+            ).SetEase(Ease.Linear)
+        );
+
+        seq.OnComplete(() =>
+        {
+            fishObj.transform.SetParent(hand);
+            fishObj.transform.localPosition = Vector3.zero;
+            fishObj.transform.localRotation = Quaternion.identity;
+
+            // Pause before inventory
+            DOVirtual.DelayedCall(2f, () =>
+            {
+                InventoryService.AddToPlayer(fishSO);
+                Destroy(fishObj);
+            });
+        });
+    }
+
+
+
 }
