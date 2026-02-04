@@ -89,7 +89,8 @@ public class StoreManager : MonoBehaviour
 
         for (int i = 0; i < inv.SlotCount; i++)
         {
-            if (inv.GetItem(i) == item)
+            var it = inv.GetItem(i);
+            if (it != null && !it.isQuestItem && it == item)
                 count++;
         }
 
@@ -103,7 +104,7 @@ public class StoreManager : MonoBehaviour
         for (int i = 0; i < inv.SlotCount; i++)
         {
             var fish = inv.GetItem(i);
-            if (fish != null)
+            if (fish != null && !fish.isQuestItem)
                 unique.Add(fish);
         }
 
@@ -114,7 +115,8 @@ public class StoreManager : MonoBehaviour
     {
         for (int i = 0; i < inv.SlotCount && amount > 0; i++)
         {
-            if (inv.GetItem(i) == item)
+            var it = inv.GetItem(i);
+            if (it != null && !it.isQuestItem && it == item)
             {
                 inv.RemoveAt(i);
                 amount--;
@@ -130,7 +132,7 @@ public class StoreManager : MonoBehaviour
         {
             var fish = inv.GetItem(i);
 
-            if (fish != null && !removedTypes.Contains(fish))
+            if (fish != null && !fish.isQuestItem && !removedTypes.Contains(fish))
             {
                 inv.RemoveAt(i);
                 removedTypes.Add(fish);

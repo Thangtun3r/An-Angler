@@ -19,14 +19,14 @@ public class UIFishSlot : MonoBehaviour, IPointerClickHandler
         fishInventory = fishInven;
     }
 
-    public void OnPointerClick(PointerEventData evaentData)
+    public void OnPointerClick(PointerEventData eventData)
     {
         if (selectedIndex == -1)
         {
             if (!isDiscardSlot && fishInventory.GetItem(slotIndex) != null)
             {
                 selectedIndex = slotIndex;
-                CursorFollower.Instance.SetIcon(fishImage.sprite);
+                CursorFollower.Instance?.SetIcon(fishImage.sprite);
                 fishImage.color = new Color(1, 1, 1, 0);
             }
         }
@@ -34,18 +34,18 @@ public class UIFishSlot : MonoBehaviour, IPointerClickHandler
         {
             if (isDiscardSlot)
             {
-                if(currentFish.isQuestItem == true)
-                {
-                    return;
-                }
+                var selectedItem = fishInventory.GetItem(selectedIndex);
+                if (selectedItem == null) return;          
+                if (selectedItem.isQuestItem) return;        
                 fishInventory.RemoveAt(selectedIndex);
             }
             else
             {
                 fishInventory.SwapSlots(selectedIndex, slotIndex);
             }
+    
             selectedIndex = -1;
-            CursorFollower.Instance.SetIcon(null);
+            CursorFollower.Instance?.SetIcon(null);
         }
     }
 

@@ -20,6 +20,7 @@ public class FishInventory : MonoBehaviour
             slots.Add(new InventoryItem());
     }
 
+    //call this to add an item to the inventory
     public bool AddItem(ItemSO item)
     {
         if (item == null) return false;
