@@ -4,7 +4,6 @@ using UnityEngine;
 public class Bobber : MonoBehaviour
 {
     public static event Action OnBobberLanded;
-    
     public IFish currentFish;
 
     [Header("Detection Settings")]
@@ -17,22 +16,16 @@ public class Bobber : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
-        // Ensure the Rigidbody is set to Continuous for extra safety
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
     }
 
     private void FixedUpdate()
     {
         if (hasLanded) return;
-
-        // Calculate the distance the bobber will travel this physics step
+        
         float stepDistance = rb.velocity.magnitude * Time.fixedDeltaTime;
         Vector3 moveDirection = rb.velocity.normalized;
-
-        // Use a minimum distance check to ensure it detects ground even when moving slowly
         float castDistance = Mathf.Max(stepDistance, 0.1f);
-
-        // Perform a SphereCast in the direction of travel
         if (Physics.SphereCast(transform.position, groundCheckRadius, moveDirection,
                 out RaycastHit hit, castDistance, groundLayer))
         {
@@ -44,7 +37,6 @@ public class Bobber : MonoBehaviour
     {
         hasLanded = true;
         
-        // Snap to the point of impact so it doesn't float in the air
         transform.position = hit.point + (hit.normal * groundCheckRadius);
         
         rb.isKinematic = true;

@@ -19,14 +19,14 @@ public class UIFishSlot : MonoBehaviour, IPointerClickHandler
         fishInventory = fishInven;
     }
 
-    public void OnPointerClick(PointerEventData evaentData)
+    public void OnPointerClick(PointerEventData eventData)
     {
         if (selectedIndex == -1)
         {
             if (!isDiscardSlot && fishInventory.GetItem(slotIndex) != null)
             {
                 selectedIndex = slotIndex;
-                CursorFollower.Instance.SetIcon(fishImage.sprite);
+                CursorFollower.Instance?.SetIcon(fishImage.sprite);
                 fishImage.color = new Color(1, 1, 1, 0);
             }
         }
@@ -34,14 +34,18 @@ public class UIFishSlot : MonoBehaviour, IPointerClickHandler
         {
             if (isDiscardSlot)
             {
+                var selectedItem = fishInventory.GetItem(selectedIndex);
+                if (selectedItem == null) return;          
+                if (selectedItem.isQuestItem) return;        
                 fishInventory.RemoveAt(selectedIndex);
             }
             else
             {
                 fishInventory.SwapSlots(selectedIndex, slotIndex);
             }
+    
             selectedIndex = -1;
-            CursorFollower.Instance.SetIcon(null);
+            CursorFollower.Instance?.SetIcon(null);
         }
     }
 
@@ -49,24 +53,16 @@ public class UIFishSlot : MonoBehaviour, IPointerClickHandler
     {
         if (isDiscardSlot) return;
 
-        if (slotIndex == selectedIndex)
-        {
-            fishImage.sprite = null;
-            fishImage.color = new Color(1, 1, 1, 0);
-            return;
-        }
-
         currentFish = fishInventory.GetItem(slotIndex);
-
+        fishImage.color = Color.white;
         if (currentFish == null)
         {
+            fishName = "Empty";
             fishImage.sprite = null;
             fishImage.color = new Color(1, 1, 1, 0);
             return;
         }
-
+        fishName = currentFish.item_name;
         fishImage.sprite = currentFish.item_sprite;
-        fishImage.color = Color.white;
     }
-
 }

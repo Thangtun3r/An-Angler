@@ -5,6 +5,8 @@ using UnityEngine;
 public class FishInventory : MonoBehaviour
 {
     public static event Action OnInventoryChanged;
+    public int SlotCount => slots.Count;
+
 
     [SerializeField] private int slotCount = 20;
 
@@ -12,12 +14,14 @@ public class FishInventory : MonoBehaviour
 
     void Awake()
     {
+        InventoryService.RegisterPlayerInventory(this);
         slots = new List<InventoryItem>(slotCount);
 
         for (int i = 0; i < slotCount; i++)
             slots.Add(new InventoryItem());
     }
 
+    //call this to add an item to the inventory
     public bool AddItem(ItemSO item)
     {
         if (item == null) return false;
@@ -38,6 +42,7 @@ public class FishInventory : MonoBehaviour
     public bool RemoveItem(ItemSO item)
     {
         if (item == null) return false;
+        if (item.isQuestItem) return false; 
 
         for (int i = 0; i < slots.Count; i++)
         {
@@ -52,6 +57,7 @@ public class FishInventory : MonoBehaviour
         return false;
     }
 
+
     public ItemSO GetItem(int index)
     {
         if (!IsValidIndex(index)) return null;
@@ -62,12 +68,16 @@ public class FishInventory : MonoBehaviour
     {
         if (!IsValidIndex(index)) return;
 
-        if (slots[index].itemData != null)
-        {
-            slots[index].itemData = null;
-            NotifyChange();
-        }
+        var item = slots[index].itemData;
+
+        if (item == null) return;
+
+        if (item.isQuestItem) return; 
+
+        slots[index].itemData = null;
+        NotifyChange();
     }
+
 
     public void SwapSlots(int a, int b)
     {

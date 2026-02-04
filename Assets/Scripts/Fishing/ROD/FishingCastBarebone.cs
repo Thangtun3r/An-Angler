@@ -2,9 +2,14 @@ using UnityEngine;
 
 public class FishingCast : MonoBehaviour
 {
-    [Header("References")]
+
+    [Header("Player Setup")] 
+    public Transform handTransform;
+    [Header("Bobber Setup")]
     public Rigidbody bobberRT;
     public Bobber bobber;
+    
+    [Header("Rod Setup")]
     public Transform head;
     public Transform rodHead;
     public LineRenderer line;
@@ -16,8 +21,6 @@ public class FishingCast : MonoBehaviour
     private bool hasCasted;
     private bool isReeling;
 
-    [HideInInspector] public bool isTalking = false;
-
     private void Start()
     {
         line.positionCount = 2;
@@ -27,19 +30,15 @@ public class FishingCast : MonoBehaviour
 
     private void Update()
     {
-        if (!isTalking)
+        if (Input.GetMouseButtonDown(0))
         {
-            // One button to rule them all
-            if (Input.GetMouseButtonDown(0))
+            if (!hasCasted && !isReeling)
             {
-                if (!hasCasted && !isReeling)
-                {
-                    CastRod();
-                }
-                else if (hasCasted && !isReeling)
-                {
-                    StartReel();
-                }
+                CastRod();
+            }
+            else if (hasCasted && !isReeling)
+            {
+                StartReel();
             }
         }
 
@@ -53,7 +52,6 @@ public class FishingCast : MonoBehaviour
         hasCasted = true;
         isReeling = false;
         
-        // Ensure the bobber is ready for a new flight
         bobber.ResetBobber();
 
         bobberRT.transform.parent = null;
@@ -68,10 +66,9 @@ public class FishingCast : MonoBehaviour
 
     private void StartReel()
     {
-        // Check for fish catch (only triggers if bobber is currently on a fish)
         if (bobber.currentFish != null && bobber.currentFish.IsBiting())
         {
-            bobber.currentFish.TryCatchFish(bobberRT.transform);
+            bobber.currentFish.TryCatchFish(handTransform.transform);
         }
 
         isReeling = true;
@@ -87,8 +84,7 @@ public class FishingCast : MonoBehaviour
             rodHead.position,
             reelSpeed * Time.deltaTime
         );
-
-        // Snap back to rod when close enough
+        
         if (Vector3.Distance(bobberRT.transform.position, rodHead.position) < 0.05f)
         {
             isReeling = false;
