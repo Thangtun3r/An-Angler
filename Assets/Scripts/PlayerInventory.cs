@@ -1,30 +1,25 @@
 using System;
-using DG.Tweening;
 using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
     public FishInventory Inventory { get; private set; }
 
-    public RectTransform uiInventoryParent;
-    public Vector2 hiddenPosition;
+    public Animator inventoryAnimator;
 
-    private Vector2 defaultPosition;
     private bool isOpen;
-    private Tween inventoryTween;
-    
-    public static event Action<bool> OnInventoryToggled; 
 
-    
+    public static event Action<bool> OnInventoryToggled;
+
     private void Awake()
     {
-        
         Inventory = GetComponent<FishInventory>();
 
-        if (uiInventoryParent == null) return;
+        if (inventoryAnimator != null)
+        {
+            inventoryAnimator.SetBool("isOpen", false);
+        }
 
-        defaultPosition = uiInventoryParent.anchoredPosition;
-        uiInventoryParent.anchoredPosition = hiddenPosition;
         isOpen = false;
     }
 
@@ -38,20 +33,12 @@ public class PlayerInventory : MonoBehaviour
 
     private void ToggleInventory()
     {
-        if (uiInventoryParent == null) return;
-
-        inventoryTween?.Kill();
-
-        Vector2 targetPos = isOpen ? hiddenPosition : defaultPosition;
-        Ease ease = isOpen ? Ease.InCubic : Ease.OutCubic;
-
-        inventoryTween = uiInventoryParent
-            .DOAnchorPos(targetPos, 0.2f)
-            .SetEase(ease);
+        if (inventoryAnimator == null) return;
 
         isOpen = !isOpen;
 
+        inventoryAnimator.SetBool("isOpen", isOpen);
+
         OnInventoryToggled?.Invoke(isOpen);
     }
-
 }
