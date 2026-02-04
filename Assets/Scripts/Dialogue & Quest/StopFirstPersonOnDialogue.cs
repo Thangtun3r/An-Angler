@@ -24,7 +24,7 @@ public class StopFirstPersonOnDialogue: MonoBehaviour
         Debug.Log(dialogueRunner.gameObject.name);
     } 
 
-    public void DisableFirstPersonCam()
+    public void DisablePlayer()
     {
         //In order: free mouse, stop cam from following mouse, stop click from triggering dialogue, stop fishing rod from casting
         player.UnlockMouse();
@@ -32,26 +32,28 @@ public class StopFirstPersonOnDialogue: MonoBehaviour
         playerInteraction.isTalking = true;
         fishingCast.isTalking = true;
         player.FreezeMovementOnly();
+        player.DisablePlayer();
     }
 
-    public void ReturnFirstPersonCam()
+    public void ReturnPlayer()
     {
         player.LockMouse();
         playerMovement.isTalking = false;
         playerInteraction.isTalking = false;
         fishingCast.isTalking = false;
         player.UnFreezeMovementOnly();
+        player.EnablePlayer();
     }
 
     void OnEnable()
     {
-        dialogueRunner.onDialogueComplete.AddListener(ReturnFirstPersonCam);
-        dialogueRunner.onDialogueStart.AddListener(DisableFirstPersonCam);
+        dialogueRunner.onDialogueComplete.AddListener(ReturnPlayer);
+        dialogueRunner.onDialogueStart.AddListener(DisablePlayer);
     }
 
     void OnDisable()
     {
-        dialogueRunner.onDialogueComplete.RemoveListener(ReturnFirstPersonCam);
-        dialogueRunner.onDialogueStart.RemoveListener(DisableFirstPersonCam);
+        dialogueRunner.onDialogueComplete.RemoveListener(ReturnPlayer);
+        dialogueRunner.onDialogueStart.RemoveListener(DisablePlayer);
     }
 }

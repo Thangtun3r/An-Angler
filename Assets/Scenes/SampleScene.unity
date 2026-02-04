@@ -427,6 +427,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba33926093ee5f04eac6eede106b179a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  handTransform: {fileID: 0}
   bobberRT: {fileID: 1446184821}
   bobber: {fileID: 1446184820}
   head: {fileID: 882812813}

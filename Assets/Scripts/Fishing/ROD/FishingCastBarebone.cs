@@ -20,6 +20,7 @@ public class FishingCast : MonoBehaviour
 
     private bool hasCasted;
     private bool isReeling;
+    [HideInInspector] public bool isTalking;
 
     private void Start()
     {
@@ -30,7 +31,7 @@ public class FishingCast : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !isTalking)
         {
             if (!hasCasted && !isReeling)
             {
