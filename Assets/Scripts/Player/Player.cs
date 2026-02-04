@@ -4,36 +4,17 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     private PlayerMovement movement;
-    private PlayerInteraction interaction;
     public CharacterController characterController;
 
     private void Awake()
     {
         movement = GetComponent<PlayerMovement>();
-        interaction = GetComponent<PlayerInteraction>();
         characterController = GetComponent<CharacterController>();
     }
-
 
     private void Start()
     {
         LockMouse();
-    }
-
-
-    private void DisablePlayer()
-    {
-        movement.enabled = false;
-        interaction.enabled = false;
-        characterController.enabled = false;
-    }
-
-    private void EnablePlayer()
-    {
-        movement.enabled = true;
-        interaction.enabled = true;
-        characterController.enabled = true;
-        
     }
 
     public void FreezeMovementOnly()
@@ -49,26 +30,13 @@ public class Player : MonoBehaviour
     
     public void LockMouse()
     {
-        /*Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;*/
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     public void UnlockMouse()
     {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-    }
-
-    void SetPlayerSpawnPoint(Transform spawnPoint)
-    {
-        
-        // Disable CharacterController to allow position changes
-        characterController.enabled = false;
-        transform.position = spawnPoint.position;
-        transform.rotation = spawnPoint.rotation;
-        movement.ResetHead();
-        
-        // Re-enable CharacterController
-        characterController.enabled = true;
     }
 }

@@ -31,7 +31,7 @@ public class StopFirstPersonOnDialogue: MonoBehaviour
         playerMovement.isTalking = true;
         playerInteraction.isTalking = true;
         fishingCast.isTalking = true;
-
+        player.FreezeMovementOnly();
     }
 
     public void ReturnFirstPersonCam()
@@ -40,6 +40,7 @@ public class StopFirstPersonOnDialogue: MonoBehaviour
         playerMovement.isTalking = false;
         playerInteraction.isTalking = false;
         fishingCast.isTalking = false;
+        player.UnFreezeMovementOnly();
     }
 
     void OnEnable()
