@@ -6,5 +6,4 @@ public interface IPlayerInteraction
 {
     public void Interact();
     public void Highlight();
-    public void Unhighlight();
 }
